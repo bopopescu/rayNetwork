@@ -65,7 +65,7 @@ usage_str = (
     "    start: start an existing cluster\n"
     "    terminate: terminate a running cluster\n"
     "    status: show whether the cluster is up or down\n"
-    "    master: returns details of the master node of the cluster\n"
+    "    main: returns details of the main node of the cluster\n"
     "    reassign_label: reassign label from one cluster to another\n"
     "    snapshot: take snapshot of cluster\n"
     "    restore_point: restore cluster from snapshot\n"
@@ -273,15 +273,15 @@ def _create_cluster_info(arguments, api_version):
                                       aws_availability_zone=arguments.aws_availability_zone,
                                       vpc_id=arguments.vpc_id,
                                       subnet_id=arguments.subnet_id,
-                                      master_elastic_ip=arguments.master_elastic_ip,
+                                      main_elastic_ip=arguments.main_elastic_ip,
                                       disallow_cluster_termination=arguments.disallow_cluster_termination,
                                       enable_ganglia_monitoring=arguments.enable_ganglia_monitoring,
                                       node_bootstrap_file=arguments.node_bootstrap_file,
-                                      master_instance_type=arguments.master_instance_type,
-                                      slave_instance_type=arguments.slave_instance_type,
+                                      main_instance_type=arguments.main_instance_type,
+                                      subordinate_instance_type=arguments.subordinate_instance_type,
                                       initial_nodes=arguments.initial_nodes,
                                       max_nodes=arguments.max_nodes,
-                                      slave_request_type=arguments.slave_request_type,
+                                      subordinate_request_type=arguments.subordinate_request_type,
                                       fallback_to_ondemand=arguments.fallback_to_ondemand,
                                       node_base_cooldown_period=arguments.node_base_cooldown_period,
                                       node_spot_cooldown_period=arguments.node_spot_cooldown_period,
@@ -327,16 +327,16 @@ def _create_cluster_info(arguments, api_version):
                                       arguments.aws_availability_zone,
                                       arguments.vpc_id,
                                       arguments.subnet_id,
-                                      arguments.master_elastic_ip,
+                                      arguments.main_elastic_ip,
                                       arguments.role_instance_profile,
                                       arguments.bastion_node_public_dns)
 
-        cluster_info.set_hadoop_settings(arguments.master_instance_type,
-                                         arguments.slave_instance_type,
+        cluster_info.set_hadoop_settings(arguments.main_instance_type,
+                                         arguments.subordinate_instance_type,
                                          arguments.initial_nodes,
                                          arguments.max_nodes,
                                          custom_config,
-                                         arguments.slave_request_type,
+                                         arguments.subordinate_request_type,
                                          arguments.use_hbase,
                                          arguments.custom_ec2_tags,
                                          arguments.use_hadoop2,
@@ -417,9 +417,9 @@ def cluster_status_action(clusterclass, args):
     return 0
 
 
-def cluster_master_action(clusterclass, args):
+def cluster_main_action(clusterclass, args):
     checkargs_cluster_id_label(args)
-    result = clusterclass.master(args.pop(0))
+    result = clusterclass.main(args.pop(0))
     print(json.dumps(result, indent=4))
     return 0
 
@@ -475,7 +475,7 @@ def cluster_update_node_action(clusterclass, args):
 
 def clustermain(args, api_version):
     clusterclass = Cluster
-    actionset = set(["create", "delete", "update", "clone", "list", "start", "terminate", "status", "master", "reassign_label", "add_node", "remove_node", "update_node", "snapshot", "restore_point", "get_snapshot_schedule", "update_snapshot_schedule"])
+    actionset = set(["create", "delete", "update", "clone", "list", "start", "terminate", "status", "main", "reassign_label", "add_node", "remove_node", "update_node", "snapshot", "restore_point", "get_snapshot_schedule", "update_snapshot_schedule"])
 
     if len(args) < 1:
         sys.stderr.write("missing argument containing action\n")
